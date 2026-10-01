@@ -1,6 +1,11 @@
 from flask import Flask
 from dotenv import load_dotenv
 import os, requests, math
+import re
+from airportsdata import load
+
+airports = load("ICAO")
+
 load_dotenv()
 client_id = os.getenv("CLIENT_ID")
 client_secret = os.getenv("CLIENT_SECRET")
@@ -64,8 +69,36 @@ def get_data(token, lat, long, radius):
                 "distance": d
             })
     
+    for i in nearme:
+        sign = i["callsign"]
+        i["origin_airport"] = extract_route(sign)[0][1]
+        i["dest_airport"] = extract_route(sign)[1][1]
+        i["origin_code"] = extract_route(sign)[0][0]
+        i["dest_code"] = extract_route(sign)[1][0]
+
     return nearme
 
+def extract_route(sign):
+    url = f"https://flightaware.com/live/flight/{sign}"
+    r = requests.get(url,headers={"User-Agent": "Mozilla/5.0"},timeout=20)
+    r.raise_for_status()
+
+    text = r.text
+    origin_icao = None
+    dest_icao = None
+
+    m_origin = re.search(r"setTargeting\('origin',\s*'([^']+)'\)", text)
+    if m_origin:
+        origin_icao = m_origin.group(1)
+
+    m_dest = re.search(r"setTargeting\('destination',\s*'([^']+)'\)", text)
+    if m_dest:
+        dest_icao = m_dest.group(1)
+
+    origin_name = airports.get(origin_icao, {}).get("name") if origin_icao else "Couldn't Find"
+    dest_name = airports.get(dest_icao, {}).get("name") if dest_icao else "Couldn't Find"
+
+    return [[origin_icao, origin_name], [dest_icao, dest_name]]
 
 app = Flask(__name__)
 
