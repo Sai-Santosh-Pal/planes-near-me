@@ -3,7 +3,7 @@ import "./global.css";
 import Plane from './components/Planes';
 import { fetchData } from './api/fetchData';
 import { useEffect, useState } from 'react';
-
+import * as Location from 'expo-location'
 
 
 export default function App() {
@@ -11,12 +11,22 @@ export default function App() {
   useEffect(() => {
     const getPlanes = async () => {
       try {
+        const {perm} = await Location.requestForegroundPermissionsAsync()
+        console.log(perm, "-permission")
+        // if (perm !== "granted") {
+        //   console.log(perm)
+        //   console.log("perm decline - show popup here")
+        //   return;
+        // }
+        const currentLocation = await Location.getCurrentPositionAsync({})
+
+        const {latitude, longitude} = currentLocation.coords
+        console.log(latitude, longitude)
         const output = await fetchData({
-          lat: 28.542355,
-          long: 77.1397189,
-          radius: 1
+          lat: latitude,
+          long: longitude,
+          radius: 2
         })
-        console.log(output)
         setData(output)
       } catch (error) {
         console.error(error)
