@@ -1,5 +1,6 @@
 import { Text, View } from 'react-native';
 import "./global.css";
+import Plane from './components/Planes';
 
 export default function App() {
   return (
@@ -14,6 +15,15 @@ export default function App() {
 
         </View>
         <Text className="coord self-center mt-2 italic text-gray-300">Coordinates: </Text>
+      </View>
+      <View className="planes px-5 mt-10 flex">
+        <Text className="mb-5 text-xl font-black">Planes Found</Text>
+        <Plane name="Air India" origin="DEL" dest="BLR" coords="coords here"/>
+        <Plane name="Air India" origin="DEL" dest="BLR" coords="coords here"/>
+        <Plane name="Air India" origin="DEL" dest="BLR" coords="coords here"/>
+        {/* <Plane />
+        <Plane />
+        <Plane /> */}
       </View>
     </View>
   );
