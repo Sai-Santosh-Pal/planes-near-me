@@ -1,21 +1,20 @@
-import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
+import { Text, View } from 'react-native';
 import "./global.css";
 
 export default function App() {
   return (
-    <View style={styles.container}>
-      <Text className="bg-red-100 text-4xl">Open up App.js to start working on your app!</Text>
-      <StatusBar style="auto" />
+    <View className="mt-10 mx-2">
+      <View className="topbar flex items-center jusify-center">
+        <Text className="py-3 text-md">Planes Near Me</Text>
+        <View className="h-[1px] w-[90vw] bg-gray-100 flex items-center justify-center"><Text>.</Text></View>
+      </View>
+      <View className="location mt-5 px-5 flex flex-col">
+        <Text className="text-xl font-black">Your Location</Text>
+        <View className="map self-center bg-gray-100 h-[300px] w-[100%] mt-5">
+
+        </View>
+        <Text className="coord self-center mt-2 italic text-gray-300">Coordinates: </Text>
+      </View>
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
