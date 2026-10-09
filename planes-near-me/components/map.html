@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<style>
+
+</style>
+<body>
+    <div class="map"></div>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script>
+        const map = L.map('map').setView(
+            [lat, long]
+        )
+        L.tileLayer(
+            'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+            {
+                maxZoom: 19,
+                attribution: '&copy; OpenStreet Map contributors'
+            }
+        ).addTo(map)
+
+        L.marker([lat, long])
+            .addTo(map)
+            .bindPopup('You')
+        
+        const planes = []
+
+        planes.forEach(plane => {
+            const plat = Number(plane.lat)
+            const plong = Number(plane.lon)
+            if (!isNaN(plat) && !isNaN(plong)) {
+                L.marker([plat, plong])
+                    .addTo(map)
+                    .bindPopup(plane.callsign || 'Aircraft')
+            }
+        })
+    </script>
+</body>
+</html>

@@ -9,6 +9,7 @@ airports = load("ICAO")
 load_dotenv()
 client_id = os.getenv("CLIENT_ID")
 client_secret = os.getenv("CLIENT_SECRET")
+api_key = os.getenv("API_KEY")
 print(client_id, client_secret)
 def haversine_calc(lat1, long1, lat2, long2):
     R = 6371
@@ -31,6 +32,27 @@ def get_token():
     return r.json()['access_token']
 
 
+def get_img(id):
+    url = f"https://hexdb.io/api/v1/aircraft/{id}"
+    r = requests.get(url)
+    try:
+        r.raise_for_status()
+        name = r.json()["RegisteredOwners"]
+        if name == "Air India":
+            return "https://images.seeklogo.com/logo-png/0/2/air-india-logo-png_seeklogo-5113.png"
+        else:
+            api_url = f'https://api.api-ninjas.com/v1/logo?name={name}'
+            response = requests.get(api_url, headers={'X-Api-Key': api_key})
+            if response.status_code == requests.codes.ok:
+                return eval(response.text)[0]["image"]
+            else:
+                return [response.status_code, response.text]
+    except Exception as e:
+        # return str(e)
+        return "https://upload.wikimedia.org/wikipedia/commons/3/36/United_Airlines_Boeing_777-200_Meulemans.jpg"
+
+
+
 def get_data(token, lat, long, radius):
     delta = max(radius / 111, 1.0)
     lamin, lamax = lat - delta, lat +delta
@@ -50,12 +72,13 @@ def get_data(token, lat, long, radius):
     r.raise_for_status()
     data = r.json().get("states")
     nearme = []
+    # return r.json
     for i in data:
         icao24 = i[0]
         callsign = (i[1] or "").strip()
         lon = i[5]
         lati = i[6]
-
+        image = get_img(icao24)
         if lat is None or lon is None:
             continue
         d = haversine_calc(lat, long, lati, long)
@@ -66,7 +89,8 @@ def get_data(token, lat, long, radius):
                 "callsign": callsign,
                 "lat": lati,
                 "lon": lon,
-                "distance": d
+                "distance": d,
+                "image": image
             })
     
     for i in nearme:
