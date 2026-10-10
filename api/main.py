@@ -51,7 +51,7 @@ def get_img(id):
         name = r.json()["RegisteredOwners"]
         if name == "IndiGo":
             return "https://img.logo.dev/goindigo.com?token=pk_V3sa80FXS7qWsGwYzRhbYA"
-"
+
         else:
             api_url = f"https://img.logo.dev/{name}?token=pk_V3sa80FXS7qWsGwYzRhbYA"
             # response = requests.get(api_url, headers={'X-Api-Key': api_key})
