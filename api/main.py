@@ -37,16 +37,29 @@ def get_img(id):
     r = requests.get(url)
     try:
         r.raise_for_status()
+        # name = r.json()["RegisteredOwners"]
+        # if name == "Air India":
+        #     return "https://images.seeklogo.com/logo-png/0/2/air-india-logo-png_seeklogo-5113.png"
+        # else:
+        #     api_url = f'https://api.api-ninjas.com/v1/logo?name={name}'
+        #     response = requests.get(api_url, headers={'X-Api-Key': api_key})
+        #     if response.status_code == requests.codes.ok:
+        #         return eval(response.text)[0]["image"]
+        #     else:
+        #         return [response.status_code, response.text]
+
         name = r.json()["RegisteredOwners"]
-        if name == "Air India":
-            return "https://images.seeklogo.com/logo-png/0/2/air-india-logo-png_seeklogo-5113.png"
+        if name == "IndiGo":
+            return "https://img.logo.dev/goindigo.com?token=pk_V3sa80FXS7qWsGwYzRhbYA"
+"
         else:
-            api_url = f'https://api.api-ninjas.com/v1/logo?name={name}'
-            response = requests.get(api_url, headers={'X-Api-Key': api_key})
-            if response.status_code == requests.codes.ok:
-                return eval(response.text)[0]["image"]
-            else:
-                return [response.status_code, response.text]
+            api_url = f"https://img.logo.dev/{name}?token=pk_V3sa80FXS7qWsGwYzRhbYA"
+            # response = requests.get(api_url, headers={'X-Api-Key': api_key})
+            # if response.status_code == requests.codes.ok:
+            #     return eval(response.text)[0]["image"]
+            # else:
+            #     return [response.status_code, response.text]
+            return api_url
     except Exception as e:
         # return str(e)
         return "https://upload.wikimedia.org/wikipedia/commons/3/36/United_Airlines_Boeing_777-200_Meulemans.jpg"
