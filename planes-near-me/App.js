@@ -74,15 +74,9 @@ export default function App() {
       <View className="planes px-5 mt-10 flex">
         <Text className="mb-5 text-xl font-black">Planes Found</Text>
         {data.map((plane, index) => (
-          // <Text>{plane.image}</Text>
-          <>
           <Plane key={index} image={plane.image} name={plane.callsign} o_code={plane.origin_code} airports={plane.origin_airport + '-' + plane.dest_airport} d_code={plane.dest_code} />
-          </>
         ))}
       </View>
-        <Plane name="plane" o_code="ocode" airports="airport1-airport2" d_code="dcode" />
-
-        <Image style={{width: "33%", height: "100%", resizeMode: "cover"}} source={{uri: "https://placehold.co/600x400"}} />
     </View>
     
   );

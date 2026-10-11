@@ -50,10 +50,11 @@ def get_img(id):
 
         name = r.json()["RegisteredOwners"]
         if name == "IndiGo":
-            return "https://img.logo.dev/goindigo.com?token=pk_V3sa80FXS7qWsGwYzRhbYA"
-
+            return f"https://img.logo.dev/goindigo.com?token={API_KEY}"
+        if name == "Vistara":
+            api_url = f"https://img.logo.dev/name/{name}?token={API_KEY}"
         else:
-            api_url = f"https://img.logo.dev/{name}?token=pk_V3sa80FXS7qWsGwYzRhbYA"
+            api_url = f"https://img.logo.dev/name/{name}?token={API_KEY}"
             # response = requests.get(api_url, headers={'X-Api-Key': api_key})
             # if response.status_code == requests.codes.ok:
             #     return eval(response.text)[0]["image"]
@@ -62,7 +63,7 @@ def get_img(id):
             return api_url
     except Exception as e:
         # return str(e)
-        return "https://upload.wikimedia.org/wikipedia/commons/3/36/United_Airlines_Boeing_777-200_Meulemans.jpg"
+        return "https://cdn-icons-png.flaticon.com/512/0/614.png"
 
 
 
