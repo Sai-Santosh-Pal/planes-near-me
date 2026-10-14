@@ -50,11 +50,12 @@ def get_img(id):
 
         name = r.json()["RegisteredOwners"]
         if name == "IndiGo":
-            return f"https://img.logo.dev/goindigo.com?token={API_KEY}"
+            return f"https://img.logo.dev/goindigo.com?token={api_key}"
         if name == "Vistara":
-            api_url = f"https://img.logo.dev/name/{name}?token={API_KEY}"
+            api_url = f"https://img.logo.dev/name/Air%20India?token={api_key}"
+            return api_url
         else:
-            api_url = f"https://img.logo.dev/name/{name}?token={API_KEY}"
+            api_url = f"https://img.logo.dev/name/{name}?token={api_key}"
             # response = requests.get(api_url, headers={'X-Api-Key': api_key})
             # if response.status_code == requests.codes.ok:
             #     return eval(response.text)[0]["image"]

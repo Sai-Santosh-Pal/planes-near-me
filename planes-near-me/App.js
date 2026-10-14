@@ -1,10 +1,10 @@
-import { Text, View, Image } from 'react-native';
+import { Text, View, Image, Button, TouchableOpacity } from 'react-native';
 import "./global.css";
 import Plane from './components/Planes';
 import { fetchData } from './api/fetchData';
 import { useEffect, useState } from 'react';
 import * as Location from 'expo-location'
-import Map from './components/Map';
+// import Maps from './components/Maps';
 
 export default function App() {
   const [data, setData] = useState([]);
@@ -45,39 +45,49 @@ export default function App() {
     const data = await fetchData({
       lat: latitude,
       long: longitude,
-      radius:3
+      radius: 3
     })
-    console.log('data found from new loc: '+data)
+    console.log('data found from new loc: ' + data)
     setData(data)
   }
   return (
-    <View className="mt-10 mx-2">
-      <View className="topbar flex items-center jusify-center">
-        <Text className="py-3 text-md">Planes Near Me</Text>
-        <View className="h-[1px] w-[90vw] bg-gray-100 flex items-center justify-center"><Text>.</Text></View>
-      </View>
-      <View className="location mt-5 px-5 flex flex-col">
-        <Text className="text-xl font-black">Your Location</Text>
-        <View className="map self-center text-center justify-center flex items-center border-1 h-[300px] w-[100%] mt-5">
-          {/* <MapView style={{width: "100%", height: "100%"}} initialRegion={{latitude: lat, longitude: long, latitudeDelta: 0.1, longitudeDelta: 0.1}}>
-          {
-            data.map((plane, index) => (
-              <Marker key={index} coordinate={{latitude: Number(plane.lat), longitude: Number(plane.lon)}} title={plane.callsign}/>
-            ))
-          }
-        </MapView> */}
-          <Map />
+    <View className="mt-20 mx-2">
+      <View className="topbar flex items-start jusify-center">
+        <View className="flex w-full items-center flex-row justify-between">
+          <View className="flex flex-col">
+            <Text className="text-md text-2xl font-black">Planes Near Me</Text>
+            <Text className="coord italic text-gray-600">Your Coordinates: {lat}, {long}</Text>
+          </View>
+          <View>
+            <TouchableOpacity onPress={() => changeLoc('28.537298', '77.127885')} className="px-5 py-5 bg-black rounded-[1000px]">
+              
+            </TouchableOpacity>
+          </View>
         </View>
-        <Text className="coord self-center mt-2 italic text-gray-300">Your Coordinates: {lat}, {long}</Text>
-        <Text onPress={() => changeLoc('28.537298','77.127885')}>Change location to Delhi Airport</Text>
+
+        <View className="h-[1px] w-[90vw] mt-3 bg-gray-100 flex items-center justify-center"><Text>.</Text></View>
       </View>
-      <View className="planes px-5 mt-10 flex">
-        <Text className="mb-5 text-xl font-black">Planes Found</Text>
+      {/* <Text className="self-center mt-2" onPress={() => changeLoc('28.537298', '77.127885')}>Change location to Delhi Airport</Text> */}
+      <View className="planes px-5 mt-4 flex">
+        {/* <Text className="mb-5 text-xl font-black">Planes Found</Text> */}
         {data.map((plane, index) => (
           <Plane key={index} image={plane.image} name={plane.callsign} o_code={plane.origin_code} airports={plane.origin_airport + '-' + plane.dest_airport} d_code={plane.dest_code} />
         ))}
       </View>
     </View>
-    
+
   );
 }
+
+//  <View className="location mt-5 px-5 flex flex-col">
+//         <Text className="text-xl font-black">Your Location</Text>
+//         <View className="map self-center text-center justify-center flex items-center border-1 h-[300px] w-[100%] mt-5">
+//           {/* <MapView style={{width: "100%", height: "100%"}} initialRegion={{latitude: lat, longitude: long, latitudeDelta: 0.1, longitudeDelta: 0.1}}>
+//           {
+//             data.map((plane, index) => (
+//               <Marker key={index} coordinate={{latitude: Number(plane.lat), longitude: Number(plane.lon)}} title={plane.callsign}/>
+//             ))
+//           }
+//         </MapView> */}
+//         </View> 
+//       </View>
