@@ -5,11 +5,16 @@ import { fetchData } from './api/fetchData';
 import { useEffect, useState } from 'react';
 import * as Location from 'expo-location'
 // import Maps from './components/Maps';
+import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome'
+// import {  } from '@fortawesome/free-solid-svg-icons/'
+import { faLocationCrosshairs, faLocationDot } from '@fortawesome/free-solid-svg-icons'
 
 export default function App() {
   const [data, setData] = useState([]);
   const [lat, setLat] = useState(0);
   const [long, setLong] = useState(0);
+  const [radius, setRadius] = useState(1)
+  const [locationName, setLocation] = useState('Your Location')
   useEffect(() => {
     const getPlanes = async () => {
       try {
@@ -29,7 +34,7 @@ export default function App() {
         const output = await fetchData({
           lat: latitude,
           long: longitude,
-          radius: 1
+          radius: radius
         })
         console.log(output)
         setData(output)
@@ -40,14 +45,29 @@ export default function App() {
     getPlanes()
   }, [])
   const changeLoc = async (latitude, longitude) => {
-    setLat(latitude)
-    setLong(longitude)
+    const loc = locationName == 'Your Location' ? 'Delhi Airport' : 'Your Location'
+    setLocation(loc)
+    const newLat = loc == 'Your Location' ? lat : '28.537298'
+    const newLong = loc == 'Your Location' ? long : '77.127885'
+    setLat(newLat)
+    setLong(newLong)
     const data = await fetchData({
-      lat: latitude,
-      long: longitude,
-      radius: 3
+      lat: newLat,
+      long: newLong,
+      radius: radius
     })
     console.log('data found from new loc: ' + data)
+    setData(data)
+  }
+  const changeRadius = async () => {
+    const rad = radius >= 3 ? 1 : radius + 1
+    setRadius(rad)
+    const data = await fetchData({
+      lat: lat,
+      long: long,
+      radius: rad
+    })
+    console.log('data found from new rad: ' + data)
     setData(data)
   }
   return (
@@ -55,12 +75,17 @@ export default function App() {
       <View className="topbar flex items-start jusify-center">
         <View className="flex w-full items-center flex-row justify-between">
           <View className="flex flex-col">
-            <Text className="text-md text-2xl font-black">Planes Near Me</Text>
-            <Text className="coord italic text-gray-600">Your Coordinates: {lat}, {long}</Text>
+            <Text className="text-md text-[24px] font-black">Planes Near Me</Text>
+            <Text className="coord italic text-[10px] text-gray-600">Your Coordinates: {lat}, {long}</Text>
           </View>
           <View>
-            <TouchableOpacity onPress={() => changeLoc('28.537298', '77.127885')} className="px-5 py-5 bg-black rounded-[1000px]">
-              
+            <TouchableOpacity onPress={() => changeLoc()} className="flex-row px-3 mb-1 h-10 flex items-center justify-center bg-black rounded-[1000px]">
+              <FontAwesomeIcon icon={faLocationDot} size={15} color='#fff'/>
+              <Text className="text-white font-black ml-1">{locationName}</Text>
+            </TouchableOpacity>
+            <TouchableOpacity onPress={() => changeRadius()} className="px-3 h-10 flex flex-row items-center justify-center bg-black rounded-[1000px]">
+              <FontAwesomeIcon icon={faLocationCrosshairs} color='#fff'/>
+              <Text className="text-white font-black text-center ml-2">Radius: {radius}km</Text>
             </TouchableOpacity>
           </View>
         </View>
