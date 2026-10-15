@@ -7,19 +7,40 @@
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Geist:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
 </head>
 <body style="background-color: #284EAF; color: white;">
-    <div class="nav flex py-5 items-center flex-row gap-2 text-center justify-center font-medium">
-        <p>Planes Near Me</p>
-    </div>
-    <div class="h-[90vh] bg-[#284EAF]">
-        <div class="text-5xl h-full flex items-center justify-center font-bold">
-            Planes Near Me
+    <img src="bottom-left.svg" class="land-area absolute bottom-[0px] w-[40vw] max-w-60" alt="">
+    <img src="top-left.svg" class="land-area absolute top-[0px] w-[40vw] max-w-60" alt="">
+    <img src="bottom-right.svg" class="land-area absolute right-[0px] bottom-[0px] w-[40vw] max-w-60" alt="">
+    <img src="top-right.svg" class="absolute land-area right-[0px] top-[0px] w-[40vw] max-w-60" alt="">
+    <div class="h-[95vh] mt-5">
+        <div class="flex items-center h-full flex-col justify-center ">
+            <p class="text-5xl md:text-6xl font-bold">Planes Near Me</p>
+            <p class="text-center italic">i love watching planes! the app tracks planes near you and notifies you</p>
+            <p class="italic text-sm text-[#97b2fd]">fun fact: hover the green areas in the map to see a cool animation</p>
+            <a href="#" class="flex gap-2 py-2 px-7 items-center justify-evenly mt-6 mb-2 border-1 border-white rounded-xl px-5">
+                <i class="fa fa-android" aria-hidden="true"></i>
+                <p class="text-center">Download For Android</p>
+            </a>
         </div>
     </div>
+    <a class="w-[100vw] text-[#97b2fd] mt-[-20px] items-center justify-center flex text-center">
+                made with <3 by sai
+    </a>
 </body>
 <style>
+    body {
+        overflow: hidden;
+    }
+    
+    .land-area{
+        transition: ease-out 0.1s;
+    }
+    .land-area:hover {
+        transform: rotate(-18deg) scale(3);
+    }
     /* #1CD329 - green main
     #284EAF - blue main
     #22916D
