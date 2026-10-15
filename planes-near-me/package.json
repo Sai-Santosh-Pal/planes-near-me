@@ -9,6 +9,7 @@
     "@maplibre/maplibre-react-native": "^11.5.0",
     "expo": "~57.0.26",
     "expo-location": "~57.0.20",
+    "expo-notifications": "~57.0.22",
     "expo-status-bar": "~57.0.1",
     "nativewind": "^4.2.7",
     "react": "19.2.3",

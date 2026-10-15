@@ -2,12 +2,22 @@ import { Text, View, Image, Button, TouchableOpacity } from 'react-native';
 import "./global.css";
 import Plane from './components/Planes';
 import { fetchData } from './api/fetchData';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import * as Location from 'expo-location'
 // import Maps from './components/Maps';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome'
 // import {  } from '@fortawesome/free-solid-svg-icons/'
 import { faLocationCrosshairs, faLocationDot } from '@fortawesome/free-solid-svg-icons'
+import * as Notifications from 'expo-notifications'
+
+Notifications.setNotificationHandler({
+  handleNotification: async () => ({
+    shouldShowBanner: true,
+    shouldShowList: true,
+    shouldPlaySound: true,
+    shouldSetBadge: false
+  })
+})
 
 export default function App() {
   const [data, setData] = useState([]);
@@ -37,13 +47,30 @@ export default function App() {
           radius: radius
         })
         console.log(output)
+        
         setData(output)
+        await checkNewPlanes(output)
       } catch (error) {
         console.error(error)
       }
     }
     getPlanes()
   }, [])
+
+  useEffect(()=> {
+    const interval = setInterval(async () => {
+      try {
+        const output = await fetchData({
+          lat, long, radius
+        })
+        setData(output)
+        await checkNewPlanes(output)
+      } catch (error) {
+        console.error(error)
+      }
+    })
+  }, 60000)
+
   const changeLoc = async (latitude, longitude) => {
     const loc = locationName == 'Your Location' ? 'Delhi Airport' : 'Your Location'
     setLocation(loc)
@@ -58,6 +85,7 @@ export default function App() {
     })
     console.log('data found from new loc: ' + data)
     setData(data)
+    await checkNewPlanes(data)
   }
   const changeRadius = async () => {
     const rad = radius >= 3 ? 1 : radius + 1
@@ -69,6 +97,30 @@ export default function App() {
     })
     console.log('data found from new rad: ' + data)
     setData(data)
+    await checkNewPlanes(data)
+  }
+  useEffect(() =>{
+    Notifications.requestPermissionsAsync()
+  })
+  const checkNewPlanes = async (planes) => {
+    const currentPlanes = new Set(planes.map(plane => plane.callsign))
+    if (previousPlanes.current.size > 0) {
+      const newPlanes = planes.filter(plane => !previousPlanes.current.has(plane.callsign))
+      if (newPlanes.length > 0) {
+        await sendNotification(planes.map(plane => plane.callsign), planes.map(plane => plane.origin_airport + '-' + plane.dest_airport))
+      }
+    }
+    previousPlanes.current = currentPlanes
+  }
+
+  const sendNotification = async (name, route) => {
+    await Notifications.scheduleNotificationAsync({
+      content: {
+        title: `${name}`,
+        body: `${route}`
+      },
+      trigger: null
+    })
   }
   return (
     <View className="mt-20 mx-2">
