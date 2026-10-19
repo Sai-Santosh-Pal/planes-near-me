@@ -1,4 +1,4 @@
-import { Text, View, Image, Button, TouchableOpacity } from 'react-native';
+import { Text, View, Image, TouchableOpacity } from 'react-native';
 import "./global.css";
 import Plane from './components/Planes';
 import { fetchData } from './api/fetchData';
@@ -7,8 +7,9 @@ import * as Location from 'expo-location'
 // import Maps from './components/Maps';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome'
 // import {  } from '@fortawesome/free-solid-svg-icons/'
-import { faLocationCrosshairs, faLocationDot } from '@fortawesome/free-solid-svg-icons'
+import { faLocationCrosshairs, faLocationDot, faLongArrowAltUp } from '@fortawesome/free-solid-svg-icons'
 import * as Notifications from 'expo-notifications'
+import { Platform } from 'react-native';
 
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
@@ -20,6 +21,7 @@ Notifications.setNotificationHandler({
 })
 
 export default function App() {
+  const previousPlanes = useRef(new Set())
   const [data, setData] = useState([]);
   const [lat, setLat] = useState(0);
   const [long, setLong] = useState(0);
@@ -28,6 +30,20 @@ export default function App() {
   useEffect(() => {
     const getPlanes = async () => {
       try {
+        if (Platform.OS === 'android') {
+          await Notifications.setNotificationChannelAsync('default', {
+            name: 'default',
+            importance: Notifications.AndroidImportance.MAX,
+            vibrationPattern: [0, 250, 250, 250]
+          })
+        }
+        const {status: notifStatus} = await Notifications.getPermissionsAsync()
+        if (notifStatus !== 'granted') {
+          const {status: newNotifStatus} = await Notifications.requestPermissionsAsync()
+          if (newNotifStatus !== 'granted') {
+            console.log('notif perm denied')
+          }
+        }
         const { status } = await Location.requestForegroundPermissionsAsync()
         console.log(status, "-permission")
         if (status !== "granted") {
@@ -58,18 +74,20 @@ export default function App() {
   }, [])
 
   useEffect(()=> {
+    if (lat === 0 || long === 0) return
     const interval = setInterval(async () => {
       try {
-        const output = await fetchData({
-          lat, long, radius
-        })
-        setData(output)
-        await checkNewPlanes(output)
-      } catch (error) {
-        console.error(error)
+        const output = await fetchData({lat, long, radius})
+        if (Array.isArray(output)) {
+          setData(output)
+          await checkNewPlanes(output)
+        }
+      } catch(error) {
+        console.log('plane interval', error)
       }
-    })
-  }, 60000)
+    }, 60000)
+    return () => clearInterval(interval)
+  }, [lat, long, radius])
 
   const changeLoc = async (latitude, longitude) => {
     const loc = locationName == 'Your Location' ? 'Delhi Airport' : 'Your Location'
@@ -99,34 +117,57 @@ export default function App() {
     setData(data)
     await checkNewPlanes(data)
   }
-  useEffect(() =>{
-    Notifications.requestPermissionsAsync()
-  })
+  // useEffect(() =>{
+  //   const setupNotifications = async () => {
+  //     try {
+  //       await Notifications.setNotificationChannelAsync('planes', {
+  //         name: 'New plane found',
+  //         importance: Notifications.AndroidImportance.MAX,
+  //         vibrationPattern: [0, 250, 250, 250],
+  //         sound: 'default'
+  //       })
+  //       const {status} = await Notifications.requestPermissionsAsync()
+  //       console.log("notif status ", status)
+  //     } catch (error) {
+  //       console.log('notif error ', error)
+  //     }
+  //   }
+  //   setupNotifications()
+  // }, [])
   const checkNewPlanes = async (planes) => {
-    const currentPlanes = new Set(planes.map(plane => plane.callsign))
+    const currentPlanes = new Set (planes.map(plane => plane.callsign).filter(Boolean))
     if (previousPlanes.current.size > 0) {
-      const newPlanes = planes.filter(plane => !previousPlanes.current.has(plane.callsign))
-      if (newPlanes.length > 0) {
-        await sendNotification(planes.map(plane => plane.callsign), planes.map(plane => plane.origin_airport + '-' + plane.dest_airport))
+      const newPlanes = planes.filter(plane => plane.callsign && !previousPlanes.current.has(plane.callsign))
+      for (const plane of newPlanes) {
+        await sendNotification(
+          plane.callsign,
+          `${plane.origin_airport || 'Unknown'} - ${plane.dest_airport || 'Unknown'}` 
+        )
       }
     }
     previousPlanes.current = currentPlanes
   }
 
   const sendNotification = async (name, route) => {
-    await Notifications.scheduleNotificationAsync({
-      content: {
-        title: `${name}`,
-        body: `${route}`
-      },
-      trigger: null
-    })
+    try {
+      const id = await Notifications.scheduleNotificationAsync({
+        content: {
+          title: name,
+          body: route,
+          sound: 'default',
+        },
+        trigger: null
+      })
+      console.log("notif scheduled ", id)
+    } catch(error){
+      console.log("notif scheduled error ", error)
+    }
   }
   return (
-    <View className="mt-20 mx-2">
-      <View className="topbar flex items-start jusify-center">
-        <View className="flex w-full items-center flex-row justify-between">
-          <View className="flex flex-col">
+    <View className="mt-20 mx-2 bg-white text-black">
+      <View className="topbar flex items-start jusify-center bg-white text-black">
+        <View className="flex bg-white text-black w-full items-center flex-row justify-between">
+          <View className="flex  bg-white text-black flex-col">
             <Text className="text-md text-[24px] font-black">Planes Near Me</Text>
             <Text className="coord italic text-[10px] text-gray-600">Your Coordinates: {lat}, {long}</Text>
           </View>
@@ -141,11 +182,13 @@ export default function App() {
             </TouchableOpacity>
           </View>
         </View>
-
+        <TouchableOpacity onPress={() => sendNotification('test', 'abc-xyz')}>
+          <Text>check notif</Text>
+        </TouchableOpacity>
         <View className="h-[1px] w-[90vw] mt-3 bg-gray-100 flex items-center justify-center"><Text>.</Text></View>
       </View>
       {/* <Text className="self-center mt-2" onPress={() => changeLoc('28.537298', '77.127885')}>Change location to Delhi Airport</Text> */}
-      <View className="planes px-5 mt-4 flex">
+      <View className="planes bg-white text-black px-5 mt-4 flex">
         {/* <Text className="mb-5 text-xl font-black">Planes Found</Text> */}
         {data.map((plane, index) => (
           <Plane key={index} image={plane.image} name={plane.callsign} o_code={plane.origin_code} airports={plane.origin_airport + '-' + plane.dest_airport} d_code={plane.dest_code} />
