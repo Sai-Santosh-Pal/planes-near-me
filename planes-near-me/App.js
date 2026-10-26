@@ -22,11 +22,13 @@ Notifications.setNotificationHandler({
 
 export default function App() {
   const previousPlanes = useRef(new Set())
+  const hasBaseline = useRef(false)
   const [data, setData] = useState([]);
   const [lat, setLat] = useState(0);
   const [long, setLong] = useState(0);
   const [radius, setRadius] = useState(1)
   const [locationName, setLocation] = useState('Your Location')
+
   useEffect(() => {
     const getPlanes = async () => {
       try {
@@ -103,7 +105,7 @@ export default function App() {
     })
     console.log('data found from new loc: ' + data)
     setData(data)
-    await checkNewPlanes(data)
+    await checkNewPlanes(data, {resetBaseline: true})
   }
   const changeRadius = async () => {
     const rad = radius >= 3 ? 1 : radius + 1
@@ -115,7 +117,7 @@ export default function App() {
     })
     console.log('data found from new rad: ' + data)
     setData(data)
-    await checkNewPlanes(data)
+    await checkNewPlanes(data, {resetBaseline: true})
   }
   // useEffect(() =>{
   //   const setupNotifications = async () => {
@@ -134,21 +136,35 @@ export default function App() {
   //   }
   //   setupNotifications()
   // }, [])
-  const checkNewPlanes = async (planes) => {
-    const currentPlanes = new Set (planes.map(plane => plane.callsign).filter(Boolean))
-    if (previousPlanes.current.size > 0) {
-      const newPlanes = planes.filter(plane => plane.callsign && !previousPlanes.current.has(plane.callsign))
+  // const checkNewPlanes = async (planes) => {
+  //   const currentPlanes = new Set (planes.map(plane => plane.callsign).filter(Boolean))
+  //   if (previousPlanes.current.size > 0) {
+  //     const newPlanes = planes.filter(plane => plane.callsign && !previousPlanes.current.has(plane.callsign))
+  //     for (const plane of newPlanes) {
+  //       await sendNotification(
+  //         plane.callsign,
+  //         `${plane.origin_airport || 'Unknown'} - ${plane.dest_airport || 'Unknown'}` 
+  //       )
+  //     }
+  //   }
+  //   previousPlanes.current = currentPlanes
+  // }
+  const checkNewPlanes = async (planes, {resetBaseline=false} = {}) => {
+    if (!Array.isArray(planes)) return
+    const currentPlanes = new Set(planes.map(p => p.callsign).filter(Boolean))
+    if (hasBaseline.current && !resetBaseline) {
+      const newPlanes = planes.filter(p => planes.callsign && !previousPlanes.current.has(p.callsign))
       for (const plane of newPlanes) {
-        await sendNotification(
-          plane.callsign,
-          `${plane.origin_airport || 'Unknown'} - ${plane.dest_airport || 'Unknown'}` 
-        )
+        await sendNotification(plane.callsign, `${plane.origin_airport || 'Unknown'}-${plane.dest_airport || 'Unknown'}`)
+        console.log(plane.callsign, `${plane.origin_airport || 'Unknown'}-${plane.dest_airport || 'Unknown'}`)      
       }
     }
     previousPlanes.current = currentPlanes
+    hasBaseline.current = true
   }
 
   const sendNotification = async (name, route) => {
+    console.log('notification func run')
     try {
       const id = await Notifications.scheduleNotificationAsync({
         content: {
@@ -168,10 +184,10 @@ export default function App() {
       <View className="topbar flex items-start jusify-center bg-white text-black">
         <View className="flex bg-white text-black w-full items-center flex-row justify-between">
           <View className="flex  bg-white text-black flex-col">
-            <Text className="text-md text-[24px] font-black">Planes Near Me</Text>
+            <Text className="text-md text-[24px] font-black" onPress={() => sendNotification('Planes Near Me', 'this is a secret feature shhhh')}>Planes Near Me</Text>
             <Text className="coord italic text-[10px] text-gray-600">Your Coordinates: {lat}, {long}</Text>
           </View>
-          <View>
+          <View className="bg-white text-black">
             <TouchableOpacity onPress={() => changeLoc()} className="flex-row px-3 mb-1 h-10 flex items-center justify-center bg-black rounded-[1000px]">
               <FontAwesomeIcon icon={faLocationDot} size={15} color='#fff'/>
               <Text className="text-white font-black ml-1">{locationName}</Text>
@@ -182,9 +198,9 @@ export default function App() {
             </TouchableOpacity>
           </View>
         </View>
-        <TouchableOpacity onPress={() => sendNotification('test', 'abc-xyz')}>
+        {/* <TouchableOpacity onPress={() => sendNotification('test', 'abc-xyz')}>
           <Text>check notif</Text>
-        </TouchableOpacity>
+        </TouchableOpacity> */}
         <View className="h-[1px] w-[90vw] mt-3 bg-gray-100 flex items-center justify-center"><Text>.</Text></View>
       </View>
       {/* <Text className="self-center mt-2" onPress={() => changeLoc('28.537298', '77.127885')}>Change location to Delhi Airport</Text> */}
