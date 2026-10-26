@@ -9,3 +9,5 @@ Here's how it works -
 1) it takes in my location and searches for the radius in a fixed radius
 2) and whenever a plane is near me it notifies me, along with its callsign and airports
 3) and if i want, i can open the app to see some planes near the airport area or change the radius
+
+ps - i also made a api for the tracking, it takes in the coordinates and radius and returns plane data [https://saisantoshpal.hackclub.app/lat/long/radius](https://saisantoshpal.hackclub.app/lat/long/radius)
