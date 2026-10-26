@@ -3,12 +3,14 @@
     "name": "planes-near-me",
     "slug": "planes-near-me",
     "android": {
-      "package": "com.saisantoshpal.planesnearme"
+      "package": "com.saisantoshpal.planesnearme",
+      "backgroundColor": "#ffffff"
     },
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/Group 36.png",
     "userInterfaceStyle": "light",
+    "backgroundColor": "#ffffff",
     "web": {
       "favicon": "./assets/favicon.png",
       "bundler": "metro"

@@ -153,7 +153,7 @@ export default function App() {
     if (!Array.isArray(planes)) return
     const currentPlanes = new Set(planes.map(p => p.callsign).filter(Boolean))
     if (hasBaseline.current && !resetBaseline) {
-      const newPlanes = planes.filter(p => planes.callsign && !previousPlanes.current.has(p.callsign))
+      const newPlanes = planes.filter(p => p.callsign && !previousPlanes.current.has(p.callsign))
       for (const plane of newPlanes) {
         await sendNotification(plane.callsign, `${plane.origin_airport || 'Unknown'}-${plane.dest_airport || 'Unknown'}`)
         console.log(plane.callsign, `${plane.origin_airport || 'Unknown'}-${plane.dest_airport || 'Unknown'}`)      
@@ -201,7 +201,7 @@ export default function App() {
         {/* <TouchableOpacity onPress={() => sendNotification('test', 'abc-xyz')}>
           <Text>check notif</Text>
         </TouchableOpacity> */}
-        <View className="h-[1px] w-[90vw] mt-3 bg-gray-100 flex items-center justify-center"><Text>.</Text></View>
+        {/* <View className="h-[1px] w-[90vw] mt-3 bg-gray-100 flex items-center justify-center"><Text>.</Text></View> */}
       </View>
       {/* <Text className="self-center mt-2" onPress={() => changeLoc('28.537298', '77.127885')}>Change location to Delhi Airport</Text> */}
       <View className="planes bg-white text-black px-5 mt-4 flex">
